@@ -1,0 +1,219 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joke Generator</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background-color: #eef2f5;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background-color: rgb(180, 234, 238);
+            padding: 35px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        h1 {
+            color: #0a6dcf;
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        #para {
+            min-height: 130px;
+            background-color: #f5f8fa;
+            border: 1px solid #dce3e8;
+            border-radius: 7px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+            font-size: 16px;
+            line-height: 1.7;
+            margin-bottom: 22px;
+            overflow-wrap: anywhere;
+        }
+
+        .setup {
+            color: #263b50;
+            font-weight: 600;
+        }
+
+        .punchline {
+            color: #2876a8;
+            font-weight: 600;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            background-color: #0a47ca;
+            color: rgb(249, 249, 250);
+            border: none;
+            border-radius: 15px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0cb5e9;
+        }
+
+        button:disabled {
+            background-color: #8ba9bd;
+            cursor: not-allowed;
+        }
+
+        .footer {
+            margin-top: 22px;
+            color: #d10f0f;
+            font-size: 12px;
+        }
+
+        @media (max-width: 480px) {
+
+            .container {
+                padding: 25px 20px;
+            }
+
+            h1 {
+                font-size: 30px;
+            }
+
+            #para {
+                font-size: 15px;
+                padding: 18px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Joke Generator</h1>
+
+        <p class="subtitle">
+            Generate a random joke and enjoy your day.
+        </p>
+
+        <p id="para">
+            Your joke will appear here.
+        </p>
+
+        <button id="jokeBtn" onclick="jokes()">
+            Generate Joke
+        </button>
+
+       
+
+    </div>
+
+
+    <script>
+
+        let jokes = async () => {
+
+            var jokes_para = document.getElementById("para");
+            var jokeBtn = document.getElementById("jokeBtn");
+
+            jokes_para.innerHTML = "Loading...";
+            jokeBtn.disabled = true;
+
+            try {
+
+                var response = await fetch(
+                    "https://v2.jokeapi.dev/joke/Any?safe-mode"
+                );
+
+                if (!response.ok) {
+                    throw new Error("API Error");
+                }
+
+                var data = await response.json();
+
+                if (data.error) {
+                    throw new Error("Joke not found");
+                }
+
+                jokes_para.innerHTML = "";
+
+                if (data.type == "twopart") {
+
+                    var setup = document.createElement("p");
+                    setup.className = "setup";
+                    setup.textContent = data.setup;
+
+                    var punchline = document.createElement("p");
+                    punchline.className = "punchline";
+                    punchline.textContent = data.delivery;
+
+                    jokes_para.appendChild(setup);
+                    jokes_para.appendChild(punchline);
+
+                }
+
+                else {
+
+                    jokes_para.textContent = data.joke;
+
+                }
+
+            }
+
+            catch (error) {
+
+                jokes_para.innerHTML =
+                    "Something went wrong. Please try again.";
+
+                console.log(error);
+
+            }
+
+            finally {
+
+                jokeBtn.disabled = false;
+
+            }
+
+        };
+
+    </script>
+
+</body>
+
+</html>
